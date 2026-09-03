@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PromptArchitect AI — Expert Prompt Engineering Studio</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="brand">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <h2>PromptArchitect</h2>
+            </div>
+            
+            <div class="config-section">
+                <h3><i class="fa-solid fa-key"></i> API Configuration</h3>
+                <p class="hint">Your key is stored securely in your browser's LocalStorage.</p>
+                <div class="input-group">
+                    <label for="apiKey">API Provider Key</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="apiKey" placeholder="AI Studio / OpenRouter Key..." autocomplete="off">
+                        <button id="toggleKeyBtn" type="button"><i class="fa-solid fa-eye"></i></button>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="providerSelect">AI Provider</label>
+                    <select id="providerSelect">
+                        <option value="gemini">Google Gemini (Flash Free)</option>
+                        <option value="openrouter">OpenRouter (Free Models)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="config-section">
+                <h3><i class="fa-solid fa-sliders"></i> Prompt Parameters</h3>
+                
+                <div class="input-group">
+                    <label for="targetAI">Target AI Model</label>
+                    <select id="targetAI">
+                        <option value="ChatGPT (GPT-4o)">ChatGPT (GPT-4o)</option>
+                        <option value="Claude 3.5 Sonnet">Claude 3.5 Sonnet</option>
+                        <option value="Google Gemini 1.5 Pro">Google Gemini 1.5 Pro</option>
+                        <option value="Midjourney / DALL-E 3">Midjourney / DALL-E 3</option>
+                        <option value="Custom / General LLM">Custom / General LLM</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="promptStyle">Structural Style</label>
+                    <select id="promptStyle">
+                        <option value="System Persona & Context">System Persona & Context (Detailed)</option>
+                        <option value="Few-Shot Chain of Thought">Few-Shot Chain of Thought</option>
+                        <option value="Step-by-Step Task Execution">Step-by-Step Task Execution</option>
+                        <option value="Markdown Structured Template">Markdown Structured Template</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <p>Deployable on Vercel</p>
+                <span class="status-badge"><i class="fa-solid fa-circle"></i> Ready</span>
+            </div>
+        </aside>
+
+        <main class="workspace">
+            <header class="top-nav">
+                <h1>Instructive Prompt Generator</h1>
+                <p>Transform raw ideas and requests into masterclass, production-grade instructions.</p>
+            </header>
+
+            <div class="content-grid">
+                <section class="panel input-panel">
+                    <div class="panel-header">
+                        <h2><i class="fa-solid fa-pen-nib"></i> Your Request</h2>
+                        <span class="counter"><span id="charCount">0</span>/1000</span>
+                    </div>
+                    <textarea id="userRequest" maxlength="1000" placeholder="Describe what you want the AI to do... e.g., 'Write a script that scrapes real estate data and outputs clean JSON' or 'Create a warm marketing email for a coffee shop launch.'"></textarea>
+                    
+                    <div class="tag-suggestions">
+                        <span class="tag-label">Quick Ideas:</span>
+                        <button class="suggestion-tag" data-text="Build a full-stack e-commerce cart dashboard using React and Tailwind.">React E-Commerce</button>
+                        <button class="suggestion-tag" data-text="Debug a memory leak in a Node.js microservice architecture.">Node.js Debugger</button>
+                        <button class="suggestion-tag" data-text="Write a comprehensive SEO content brief for a SaaS tool.">SEO Content Brief</button>
+                    </div>
+
+                    <button id="generateBtn" class="primary-btn">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Architect Prompt
+                    </button>
+                </section>
+
+                <section class="panel output-panel">
+                    <div class="panel-header">
+                        <h2><i class="fa-solid fa-code"></i> Generated Master Prompt</h2>
+                        <div class="action-buttons">
+                            <button id="copyBtn" class="icon-btn" title="Copy to Clipboard" disabled><i class="fa-solid fa-copy"></i> Copy</button>
+                        </div>
+                    </div>
+                    
+                    <div class="output-container">
+                        <div id="placeholderState" class="placeholder-state">
+                            <i class="fa-solid fa-terminal"></i>
+                            <p>Your optimized instructions will appear here once generated.</p>
+                        </div>
+                        <div id="loadingState" class="loading-state hidden">
+                            <div class="spinner"></div>
+                            <p id="loadingStatusText">Analyzing request parameters...</p>
+                        </div>
+                        <pre id="outputCode" class="hidden"><code id="outputText"></code></pre>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
