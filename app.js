@@ -1,7 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements Mapping
     const targetAISelect = document.getElementById('targetAI');
-    const promptStyleSelect = document.getElementById('promptStyle');
+    const instructionFlowSelect = document.getElementById('instructionFlow');
+    const outputPersonaSelect = document.getElementById('outputPersona');
     const userRequestInput = document.getElementById('userRequest');
     const charCountSpan = document.getElementById('charCount');
     const generateBtn = document.getElementById('generateBtn');
@@ -15,14 +16,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const toast = document.getElementById('toast');
     const suggestionTags = document.querySelectorAll('.suggestion-tag');
 
-    // Hide API configuration card section since it's no longer needed
-    const apiKeySection = document.querySelector('.config-section');
-    if (apiKeySection) apiKeySection.style.display = 'none';
-
     // Character counter
     userRequestInput.addEventListener('input', () => {
-        const length = userRequestInput.value.length;
-        charCountSpan.textContent = length;
+        charCountSpan.textContent = userRequestInput.value.length;
     });
 
     // Handle suggestion chips
@@ -39,37 +35,36 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!textToCopy) return;
 
         navigator.clipboard.writeText(textToCopy).then(() => {
-            showToast('Prompt copied to clipboard successfully!', 'success');
-        }).catch(err => {
+            showToast('Master instruction copied to clipboard!', 'success');
+        }).catch(() => {
             showToast('Failed to copy to clipboard.', 'error');
         });
     });
 
-    // Local Generation Pipeline (Zero API Key, Instant Client-Side Processing)
-    generateBtn.addEventListener('click', async () => {
+    // Local Generation Pipeline
+    generateBtn.addEventListener('click', () => {
         const userRequest = userRequestInput.value.trim();
         const targetAI = targetAISelect.value;
-        const promptStyle = promptStyleSelect.value;
+        const instructionFlow = instructionFlowSelect.value;
+        const outputPersona = outputPersonaSelect.value;
 
         if (!userRequest) {
-            showToast('Please write down your objective or project request first.', 'error');
+            showToast('Please type your core project request or objective first.', 'error');
             userRequestInput.focus();
             return;
         }
 
-        // Simulate short professional processing state for UX feedback
         setUIState('loading');
-        loadingStatusText.textContent = 'Assembling local architecture patterns...';
+        loadingStatusText.textContent = `Optimizing instruction blueprint for ${targetAI}...`;
 
         setTimeout(() => {
-            const generatedPrompt = buildSmartPrompt(targetAI, promptStyle, userRequest);
+            const generatedPrompt = buildAdvancedMasterPrompt(targetAI, instructionFlow, outputPersona, userRequest);
             outputText.textContent = generatedPrompt;
             setUIState('success');
-            showToast('Prompt architected locally!', 'success');
-        }, 600);
+            showToast('Master prompt architected successfully!', 'success');
+        }, 500);
     });
 
-    // Helper to control view states inside the output box
     function setUIState(state) {
         placeholderState.classList.add('hidden');
         loadingState.classList.add('hidden');
@@ -86,7 +81,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Toast notification utility
     function showToast(message, type = 'success') {
         toast.textContent = message;
         toast.className = `toast ${type}`;
@@ -95,22 +89,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 4000);
     }
 
-    // Algorithmic Local Prompt Synthesizer
-    function buildSmartPrompt(targetAI, style, request) {
-        return `### ROLE & CONTEXT
-You are an elite expert AI assistant optimized specifically for ${targetAI}. Your goal is to process the user request with maximum precision, adhering strictly to production standards.
+    // Advanced Prompt Architectural Engine
+    function buildAdvancedMasterPrompt(targetAI, flowStyle, persona, request) {
+        return `### SYSTEM ROLE & PERSONA
+You are acting as a ${persona}, fine-tuned explicitly for maximum performance on **${targetAI}**. Your mission is to parse the instructions below with absolute technical rigor and produce production-ready output.
 
 ### CORE OBJECTIVE
 ${request}
 
-### STRUCTURAL & EXECUTION FORMAT (${style})
-1. **Analysis**: Break down the task requirements clearly before implementation.
-2. **Execution**: Provide comprehensive, clean, and bug-free code or writing matching the requested parameters.
-3. **Edge Cases**: Explicitly account for security considerations, boundary limits, and error handling.
-4. **Verification**: Confirm that the output fully satisfies the requested objective without placeholders or truncated code.
+### METHODOLOGY & INSTRUCTION FLOW (${flowStyle})
+Depending on your selected execution style, adhere to the following sequence:
+- **Phase 1 (Decomposition)**: Analyze prerequisites, dependencies, and expected constraints before proceeding.
+- **Phase 2 (Execution)**: Produce clean, complete, high-grade artifacts or code matching standard frameworks without using shortcuts or placeholders like "code goes here".
+- **Phase 3 (Validation & Edge Cases)**: Explicitly handle edge conditions, security implications, error-handling logic, and performance trade-offs.
 
-### CONSTRAINTS
-- Avoid unnecessary conversational filler; focus directly on clean delivery.
-- Ensure all technical frameworks or style guidelines requested are fully integrated.`;
+### CONSTRAINTS & OUTPUT GUIDELINES
+- Eliminate conversational filler; deliver directly useful, professional material.
+- If writing code, ensure robust syntax correctness, modern layout structures, and precise naming conventions.`;
     }
 });
