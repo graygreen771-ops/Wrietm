@@ -1,8 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements Mapping
-    const apiKeyInput = document.getElementById('apiKey');
-    const toggleKeyBtn = document.getElementById('toggleKeyBtn');
-    const providerSelect = document.getElementById('providerSelect');
     const targetAISelect = document.getElementById('targetAI');
     const promptStyleSelect = document.getElementById('promptStyle');
     const userRequestInput = document.getElementById('userRequest');
@@ -18,20 +15,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const toast = document.getElementById('toast');
     const suggestionTags = document.querySelectorAll('.suggestion-tag');
 
-    // LocalStorage Synchronization
-    const savedKey = localStorage.getItem('pa_api_key');
-    if (savedKey) apiKeyInput.value = savedKey;
-
-    apiKeyInput.addEventListener('input', () => {
-        localStorage.setItem('pa_api_key', apiKeyInput.value.trim());
-    });
-
-    // Toggle API Key visibility
-    toggleKeyBtn.addEventListener('click', () => {
-        const type = apiKeyInput.getAttribute('type') === 'password' ? 'text' : 'password';
-        apiKeyInput.setAttribute('type', type);
-        toggleKeyBtn.innerHTML = type === 'password' ? '<i class="fa-solid fa-eye"></i>' : '<i class="fa-solid fa-eye-slash"></i>';
-    });
+    // Hide API configuration card section since it's no longer needed
+    const apiKeySection = document.querySelector('.config-section');
+    if (apiKeySection) apiKeySection.style.display = 'none';
 
     // Character counter
     userRequestInput.addEventListener('input', () => {
@@ -59,19 +45,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Generate Request Pipeline
+    // Local Generation Pipeline (Zero API Key, Instant Client-Side Processing)
     generateBtn.addEventListener('click', async () => {
-        const apiKey = apiKeyInput.value.trim();
         const userRequest = userRequestInput.value.trim();
-        const provider = providerSelect.value;
         const targetAI = targetAISelect.value;
         const promptStyle = promptStyleSelect.value;
-
-        if (!apiKey) {
-            showToast('Please enter your API key in the configuration panel.', 'error');
-            apiKeyInput.focus();
-            return;
-        }
 
         if (!userRequest) {
             showToast('Please write down your objective or project request first.', 'error');
@@ -79,21 +57,16 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Set UI State to Loading
+        // Simulate short professional processing state for UX feedback
         setUIState('loading');
+        loadingStatusText.textContent = 'Assembling local architecture patterns...';
 
-        try {
-            loadingStatusText.textContent = 'Synthesizing expert framework...';
-            const generatedPrompt = await fetchAIResponse(provider, apiKey, targetAI, promptStyle, userRequest);
-            
+        setTimeout(() => {
+            const generatedPrompt = buildSmartPrompt(targetAI, promptStyle, userRequest);
             outputText.textContent = generatedPrompt;
             setUIState('success');
-            showToast('Prompt architected successfully!', 'success');
-        } catch (error) {
-            console.error(error);
-            showToast(error.message || 'An error occurred during generation.', 'error');
-            setUIState('placeholder');
-        }
+            showToast('Prompt architected locally!', 'success');
+        }, 600);
     });
 
     // Helper to control view states inside the output box
@@ -122,68 +95,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 4000);
     }
 
-    // AI API Request Router (Client-side fetch)
-    async function fetchAIResponse(provider, apiKey, targetAI, promptStyle, userRequest) {
-        const systemPrompt = `You are an elite Prompt Engineer. Your objective is to take user requests and convert them into structured, powerful, production-grade instructions designed specifically for execution by ${targetAI}.
-Follow these strict architectural requirements:
-- Use the following formatting style: ${promptStyle}.
-- Provide clear context constraints, output formats, edge-case handling rules, and examples if applicable.
-- Return ONLY the final output prompt text wrapped cleanly. Do not include introductory text like "Here is your prompt:".`;
+    // Algorithmic Local Prompt Synthesizer
+    function buildSmartPrompt(targetAI, style, request) {
+        return `### ROLE & CONTEXT
+You are an elite expert AI assistant optimized specifically for ${targetAI}. Your goal is to process the user request with maximum precision, adhering strictly to production standards.
 
-        if (provider === 'gemini') {
-            // Google Gemini Flash Free Tier API Call
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-            const payload = {
-                contents: [
-                    { role: "user", parts: [{ text: `${systemPrompt}\n\nUser Request: ${userRequest}` }] }
-                ]
-            };
+### CORE OBJECTIVE
+${request}
 
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+### STRUCTURAL & EXECUTION FORMAT (${style})
+1. **Analysis**: Break down the task requirements clearly before implementation.
+2. **Execution**: Provide comprehensive, clean, and bug-free code or writing matching the requested parameters.
+3. **Edge Cases**: Explicitly account for security considerations, boundary limits, and error handling.
+4. **Verification**: Confirm that the output fully satisfies the requested objective without placeholders or truncated code.
 
-            if (!response.ok) {
-                const errData = await response.json().catch(() => ({}));
-                throw new Error(errData.error?.message || `Gemini API Error: Status ${response.status}`);
-            }
-
-            const data = await response.json();
-            return data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response generated.';
-        } 
-        else if (provider === 'openrouter') {
-            // OpenRouter Free Endpoint Call
-            const url = 'https://openrouter.ai/api/v1/chat/completions';
-            const payload = {
-                model: 'google/gemini-flash-1.5', // Default robust free model router
-                messages: [
-                    { role: "system", content: systemPrompt },
-                    { role: "user", content: userRequest }
-                ]
-            };
-
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${apiKey}`,
-                    'HTTP-Referer': window.location.origin,
-                    'X-Title': 'PromptArchitect AI'
-                },
-                body: JSON.stringify(payload)
-            });
-
-            if (!response.ok) {
-                const errData = await response.json().catch(() => ({}));
-                throw new Error(errData.error?.message || `OpenRouter API Error: Status ${response.status}`);
-            }
-
-            const data = await response.json();
-            return data.choices?.[0]?.message?.content || 'No response generated.';
-        } else {
-            throw new Error('Selected AI provider is currently unsupported.');
-        }
+### CONSTRAINTS
+- Avoid unnecessary conversational filler; focus directly on clean delivery.
+- Ensure all technical frameworks or style guidelines requested are fully integrated.`;
     }
 });
